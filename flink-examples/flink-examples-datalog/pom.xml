@@ -154,6 +154,28 @@
                             </includes>
                         </configuration>
                     </execution>
+					<execution>
+						<id>WatDiv</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+
+						<configuration>
+							<classifier>WatDiv</classifier>
+							<archive>
+								<manifest>
+									<mainClass>org.apache.flink.datalog.examples.WatDiv</mainClass>
+								</manifest>
+								<manifestEntries>
+									<program-class>org.apache.flink.datalog.examples.WatDiv</program-class>
+								</manifestEntries>
+							</archive>
+							<includes>
+								<include>org/apache/flink/datalog/examples/WatDiv.class</include>
+							</includes>
+						</configuration>
+					</execution>
                 </executions>
             </plugin>
         </plugins>
