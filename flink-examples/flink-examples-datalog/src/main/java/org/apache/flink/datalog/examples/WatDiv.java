@@ -53,12 +53,11 @@ public class WatDiv {
 		File[] files = folder.listFiles();
 
 		String[] relationNames = {"author", "editor", "director", "actor", "artist"};
-		for (int i = 0; i < relationNames.length; i++){
-			String filePath = testFolderPath + relationNames[i];
+		for (String relation: relationNames){
+			String filePath = testFolderPath + relation + ".csv";
 			DataSet<Tuple2<IntValue, IntValue>> dataset = env.readCsvFile(filePath).fieldDelimiter(",").types(IntValue.class, IntValue.class);
-			datalogEnv.registerDataSet(relationNames[i], dataset, "v1,v2");
+			datalogEnv.registerDataSet(relation, dataset, "v1,v2");
 		}
-
 
 		Table queryResult = datalogEnv.datalogQuery(inputProgram, query);
 		DataSet<Tuple2<IntValue, IntValue>> resultDS = datalogEnv.toDataSet(queryResult, Types.TUPLE(Types.INT, Types.INT) );
