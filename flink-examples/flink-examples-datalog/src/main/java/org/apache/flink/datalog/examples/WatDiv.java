@@ -56,7 +56,7 @@ public class WatDiv {
 		for (int i = 0; i < relationNames.length; i++){
 			String filePath = testFolderPath + relationNames[i];
 			DataSet<Tuple2<IntValue, IntValue>> dataset = env.readCsvFile(filePath).fieldDelimiter(",").types(IntValue.class, IntValue.class);
-			datalogEnv.registerDataSet(filePath, dataset, "v1,v2");
+			datalogEnv.registerDataSet(relationNames[i], dataset, "v1,v2");
 		}
 
 
