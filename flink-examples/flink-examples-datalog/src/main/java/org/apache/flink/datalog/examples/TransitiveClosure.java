@@ -17,6 +17,7 @@
 
 package org.apache.flink.datalog.examples;
 
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.DiscardingOutputFormat;
@@ -30,33 +31,48 @@ import java.io.File;
 import java.io.PrintWriter;
 
 public class TransitiveClosure {
-    public static void main(String[] args) throws Exception {
-        String testFileName = null;
+	public static void main(String[] args) throws Exception {
+		String testFolderName = null;
 
-        if (args.length > 0) {
-            testFileName = args[0].trim();
-        } else
-            throw new Exception("Please provide input dataset. ");
-		String testFilePath = "s3://wolf4495/input/" + testFileName;
-        String inputProgram =
-                          "tc(X,Y) :- graph(X,Y).\n"
-                        + "tc(X,Y) :- tc(X,Z),graph(Z,Y).\n";
-        String query = "tc(X,Y)?";
+		if (args.length > 0) {
+			testFolderName = args[0].trim();
+		} else
+			throw new Exception("Please provide input dataset. ");
 
-        ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-        EnvironmentSettings settings = EnvironmentSettings
-                .newInstance()
-                .useDatalogPlanner()
-                .inBatchMode()
-                .build();
-        BatchDatalogEnvironment datalogEnv = BatchDatalogEnvironment.create(env, settings);
-        DataSet<Tuple2<IntValue, IntValue>> dataSet = env.readCsvFile(testFilePath).fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		String testFolderPath = "s3://wolf4495/" + testFolderName;
+		String inputProgram =
+			"madeBy(X, Y) :- author(X, Y) .\n" +
+				"madeBy(X, Y) :- editor(X, Y) .\n" +
+				"madeBy(X, Y) :- director(X, Y) .\n" +
 
-        datalogEnv.registerDataSet("graph", dataSet, "v1,v2");
-        Table queryResult = datalogEnv.datalogQuery(inputProgram, query);
-        DataSet<Tuple2<IntValue, IntValue>> resultDS = datalogEnv.toDataSet(queryResult, dataSet.getType());
-        resultDS.writeAsCsv(testFilePath+"_output");
-        System.out.println(resultDS.count());
+				"features(X, Y) :- actor(X, Y) .\n" +
+				"features(X, Y) :- artist(X, Y) .\n" +
 
-    }
+				"directed(Z, Y) :- features(X, Y), madeBy(X, Z) .";
+		String query = "directed(X,Y)?";
+
+		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+		EnvironmentSettings settings = EnvironmentSettings
+			.newInstance()
+			.useDatalogPlanner()
+			.inBatchMode()
+			.build();
+		BatchDatalogEnvironment datalogEnv = BatchDatalogEnvironment.create(env, settings);
+
+		File folder = new File(testFolderPath);
+		File[] files = folder.listFiles();
+
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isFile() && files[i].getName().endsWith(".csv")) {
+				DataSet<Tuple2<IntValue, IntValue>> dataSet = env.readCsvFile(files[i].getPath()).fieldDelimiter(",").types(IntValue.class, IntValue.class);
+				datalogEnv.registerDataSet(files[i].getName().split("\\.|_")[1], dataSet, "v1,v2");
+			}
+		}
+
+		Table queryResult = datalogEnv.datalogQuery(inputProgram, query);
+		DataSet<Tuple2<IntValue, IntValue>> resultDS = datalogEnv.toDataSet(queryResult, Types.TUPLE(Types.INT, Types.INT) );
+		//resultDS.writeAsCsv(testFilePath+"_output");
+		System.out.println(resultDS.count());
+
+	}
 }
