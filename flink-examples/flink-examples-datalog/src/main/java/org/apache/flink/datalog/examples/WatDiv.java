@@ -52,7 +52,7 @@ public class WatDiv {
 			.build();
 		BatchDatalogEnvironment datalogEnv = BatchDatalogEnvironment.create(env, settings);
 
-		String[] relationNames = {"editor", "director", "actor", "artist"};
+		String[] relationNames = {"editor", "director", "actor", "artist", "madeBy", "features"};
 
 		DataSet<Tuple2<IntValue, IntValue>> author = env.readCsvFile(testFolderPath + "author.csv").fieldDelimiter(",").types(IntValue.class, IntValue.class);
 		datalogEnv.registerDataSet("author", author, "v1,v2");
