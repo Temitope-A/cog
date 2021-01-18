@@ -29,14 +29,7 @@ import java.io.File;
 
 public class WatDiv {
 	public static void main(String[] args) throws Exception {
-		String testFolderName = null;
-
-		if (args.length > 0) {
-			testFolderName = args[0].trim();
-		} else
-			throw new Exception("Please provide input dataset. ");
-
-		String testFolderPath = "s3://wolf4495/" + testFolderName;
+		String testFolderPath = "s3://wolf4495/watdiv/";
 		String inputProgram =
 			"madeBy(X, Y) :- author(X, Y) .\n" +
 				"madeBy(X, Y) :- editor(X, Y) .\n" +
@@ -59,12 +52,13 @@ public class WatDiv {
 		File folder = new File(testFolderPath);
 		File[] files = folder.listFiles();
 
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isFile() && files[i].getName().endsWith(".csv")) {
-				DataSet<Tuple2<IntValue, IntValue>> dataSet = env.readCsvFile(files[i].getPath()).fieldDelimiter(",").types(IntValue.class, IntValue.class);
-				datalogEnv.registerDataSet(files[i].getName().split("\\.|_")[1], dataSet, "v1,v2");
-			}
+		String[] relationNames = {"author", "editor", "director", "actor", "artist"};
+		for (int i = 0; i < relationNames.length; i++){
+			String filePath = testFolderPath + relationNames[i];
+			DataSet<Tuple2<IntValue, IntValue>> dataset = env.readCsvFile(filePath).fieldDelimiter(",").types(IntValue.class, IntValue.class);
+			datalogEnv.registerDataSet(filePath, dataset, "v1,v2");
 		}
+
 
 		Table queryResult = datalogEnv.datalogQuery(inputProgram, query);
 		DataSet<Tuple2<IntValue, IntValue>> resultDS = datalogEnv.toDataSet(queryResult, Types.TUPLE(Types.INT, Types.INT) );
