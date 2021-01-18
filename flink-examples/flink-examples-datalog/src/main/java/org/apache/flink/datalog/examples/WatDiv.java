@@ -31,14 +31,14 @@ public class WatDiv {
 	public static void main(String[] args) throws Exception {
 		String testFolderPath = "s3://wolf4495/watdiv/";
 		String inputProgram =
-			"madeBy(X, Y) :- author(X, Y) .\n" +
-				"madeBy(X, Y) :- editor(X, Y) .\n" +
-				"madeBy(X, Y) :- director(X, Y) .\n" +
+			"madeBy(X,Y) :- author(X,Y) .\n" +
+				"madeBy(X,Y) :- editor(X,Y) .\n" +
+				"madeBy(X,Y) :- director(X,Y) .\n" +
 
-				"features(X, Y) :- actor(X, Y) .\n" +
-				"features(X, Y) :- artist(X, Y) .\n" +
+				"features(X,Y) :- actor(X,Y) .\n" +
+				"features(X,Y) :- artist(X,Y) .\n" +
 
-				"directed(Z, Y) :- features(X, Y), madeBy(X, Z) .";
+				"directed(Z,Y) :- features(X,Y), madeBy(X,Z) .";
 		String query = "directed(X,Y)?";
 
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -49,15 +49,23 @@ public class WatDiv {
 			.build();
 		BatchDatalogEnvironment datalogEnv = BatchDatalogEnvironment.create(env, settings);
 
-		File folder = new File(testFolderPath);
-		File[] files = folder.listFiles();
+		//String[] relationNames = {"author", "editor", "director", "actor", "artist"};
+		//for (String relation: relationNames){
+		//	String filePath = testFolderPath + relation + ".csv";
+		//	DataSet<Tuple2<IntValue, IntValue>> dataset = env.readCsvFile(filePath).fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		//	datalogEnv.registerDataSet(relation, dataset, "v1,v2");
+		//}
 
-		String[] relationNames = {"author", "editor", "director", "actor", "artist"};
-		for (String relation: relationNames){
-			String filePath = testFolderPath + relation + ".csv";
-			DataSet<Tuple2<IntValue, IntValue>> dataset = env.readCsvFile(filePath).fieldDelimiter(",").types(IntValue.class, IntValue.class);
-			datalogEnv.registerDataSet(relation, dataset, "v1,v2");
-		}
+		DataSet<Tuple2<IntValue, IntValue>> author = env.readCsvFile(testFolderPath + "author.csv").fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		datalogEnv.registerDataSet("author", author, "v1,v2");
+		DataSet<Tuple2<IntValue, IntValue>> editor = env.readCsvFile(testFolderPath + "editor.csv").fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		datalogEnv.registerDataSet("editor", editor, "v1,v2");
+		DataSet<Tuple2<IntValue, IntValue>> director = env.readCsvFile(testFolderPath + "director.csv").fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		datalogEnv.registerDataSet("director", director, "v1,v2");
+		DataSet<Tuple2<IntValue, IntValue>> artist = env.readCsvFile(testFolderPath + "artist.csv").fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		datalogEnv.registerDataSet("artist", artist, "v1,v2");
+		DataSet<Tuple2<IntValue, IntValue>> actor = env.readCsvFile(testFolderPath + "actor.csv").fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		datalogEnv.registerDataSet("actor", actor, "v1,v2");
 
 		Table queryResult = datalogEnv.datalogQuery(inputProgram, query);
 		DataSet<Tuple2<IntValue, IntValue>> resultDS = datalogEnv.toDataSet(queryResult, Types.TUPLE(Types.INT, Types.INT) );
