@@ -17,6 +17,7 @@
 
 package org.apache.flink.datalog.examples;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -59,7 +60,11 @@ public class WatDiv {
 			.build();
 		BatchDatalogEnvironment datalogEnv = BatchDatalogEnvironment.create(env, settings);
 
-		String[] relationNames = {"author", "editor", "director", "actor", "artist"};
+		String[] relationNames = {"editor", "director", "actor", "artist"};
+
+		DataSet<Tuple2<IntValue, IntValue>> author = env.readCsvFile(testFolderPath + "author.csv").fieldDelimiter(",").types(IntValue.class, IntValue.class);
+		datalogEnv.registerDataSet("author", author, "v1,v2");
+
 		for (String relation: relationNames){
 			String filePath = testFolderPath + relation + ".csv";
 			DataSet<Tuple2<IntValue, IntValue>> dataset = env.readCsvFile(filePath).fieldDelimiter(",").types(IntValue.class, IntValue.class);
@@ -78,7 +83,7 @@ public class WatDiv {
 		//datalogEnv.registerDataSet("actor", actor, "v1,v2");
 
 		Table queryResult = datalogEnv.datalogQuery(inputProgram1, query1);
-		DataSet<Tuple2<IntValue, IntValue>> resultDS = datalogEnv.toDataSet(queryResult, Types.TUPLE(Types.INT, Types.INT) );
+		DataSet<Tuple2<IntValue, IntValue>> resultDS = datalogEnv.toDataSet(queryResult, author.getType());
 		//resultDS.writeAsCsv(testFilePath+"_output");
 		System.out.println(resultDS.count());
 
