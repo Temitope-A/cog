@@ -31,12 +31,13 @@ import java.io.PrintWriter;
 
 public class TransitiveClosure {
     public static void main(String[] args) throws Exception {
-        String testFilePath = null;
+        String testFileName = null;
 
         if (args.length > 0) {
-            testFilePath = args[0].trim();
+            testFileName = args[0].trim();
         } else
             throw new Exception("Please provide input dataset. ");
+		String testFilePath = "s3://wolf4495/input/" + testFileName;
         String inputProgram =
                           "tc(X,Y) :- graph(X,Y).\n"
                         + "tc(X,Y) :- tc(X,Z),graph(Z,Y).\n";
