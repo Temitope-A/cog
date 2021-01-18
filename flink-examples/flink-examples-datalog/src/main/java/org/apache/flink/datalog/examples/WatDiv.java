@@ -39,7 +39,7 @@ public class WatDiv {
 				"features(X,Y) :- actor(X,Y) .\n" +
 				"features(X,Y) :- artist(X,Y) .\n" +
 
-				"directed(Z,Y) :- features(X,Y), madeBy(X,Z) .";
+				"directed(X,Y) :- features(Z,Y), madeBy(Z,X) .";
 		String query1 = "madeBy(X,Y)?";
 		String query2 = "features(X,Y)?";
 		String query3 = "directed(X,Y)?";
