@@ -80,7 +80,7 @@ public class WatDiv {
 		Table queryResult2 = datalogEnv.datalogQuery(inputProgram, query2);
 		DataSet<Tuple2<IntValue, IntValue>> resultDS2 = datalogEnv.toDataSet(queryResult2, author.getType());
 		System.out.println(resultDS2.count());
-		Table queryResult3 = datalogEnv.datalogQuery(inputProgram, query2);
+		Table queryResult3 = datalogEnv.datalogQuery(inputProgram, query3);
 		DataSet<Tuple2<IntValue, IntValue>> resultDS3 = datalogEnv.toDataSet(queryResult3, author.getType());
 		System.out.println(resultDS3.count());
 
