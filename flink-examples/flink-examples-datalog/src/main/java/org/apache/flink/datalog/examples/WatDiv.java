@@ -33,16 +33,19 @@ public class WatDiv {
 		String testFolderPath = "s3://wolf4495/watdiv/";
 		String inputProgram =
 			"madeBy(X,Y) :- author(X,Y) .\n" +
-				"madeBy(X,Y) :- editor(X,Y) .\n" +
-				"madeBy(X,Y) :- director(X,Y) .\n" +
+				"madeBy_I(X,Y) :- editor(X,Y) .\n" +
+				"madeBy_I(X,Y) :- director(X,Y) .\n" +
 
-				"features(X,Y) :- actor(X,Y) .\n" +
-				"features(X,Y) :- artist(X,Y) .\n" +
+				"features_I(X,Y) :- actor(X,Y) .\n" +
+				"features_I(X,Y) :- artist(X,Y) .\n" +
 
-				"directed(X,Y) :- features(Z,Y), madeBy(Z,X) .";
-		String query1 = "madeBy(X,Y)?";
-		String query2 = "features(X,Y)?";
-		String query3 = "directed(X,Y)?";
+				"features_I(X,Y) :- features(X,Y) .\n" +
+				"madeBy_I(X,Y) :- madeBy(X,Y) .\n" +
+
+				"directed_I(X,Y) :- features_I(Z,Y), madeBy_I(Z,X) .";
+		String query1 = "madeBy_I(X,Y)?";
+		String query2 = "features_I(X,Y)?";
+		String query3 = "directed_I(X,Y)?";
 
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		EnvironmentSettings settings = EnvironmentSettings
