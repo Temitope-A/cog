@@ -30,7 +30,8 @@ import java.io.File;
 
 public class WatDiv {
 	public static void main(String[] args) throws Exception {
-		String testFolderPath = "s3://wolf4495/watdiv/";
+		//String testFolderPath = "s3://wolf4495/watdiv/";
+		String testFolderPath = "watdiv/";
 		String inputProgram =
 			"madeBy(X,Y) :- author(X,Y) .\n" +
 				"madeBy_I(X,Y) :- editor(X,Y) .\n" +
